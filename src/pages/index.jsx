@@ -37,8 +37,8 @@ const features = [
     description: (
       <>
         <code>@datalogui/datalog</code> is the core database. It works with React, React
-        Native, or most other frameworks. Let DatalogUI manage the state, and use
-        your favorite frame to draw.
+        Native, and most other frameworks. Let DatalogUI manage the state, and use
+        your favorite framework to draw.
       </>
     ),
   },
