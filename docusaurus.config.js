@@ -12,7 +12,7 @@ module.exports = {
       title: 'Datalog UI',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo-only-transparent.png',
       },
       links: [
         {
