@@ -189,7 +189,7 @@ lazy. Much like me, they won't do anything unless you ask them to. In this
 case, we have to ask it to run the query again because we know the dependencies
 (The `People` table) have changed. Let's try that again.
 ```ts
-People.assert({ id: 2, name: "Eve" })
+// People.assert({ id: 2, name: "Eve" }) // We did this already
 // Hey Query! go ahead and run yourself
 Query.runQuery()
 queryView.recentData()
