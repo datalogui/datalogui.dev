@@ -1,8 +1,11 @@
+const path = require('path')
+
 module.exports = {
   title: 'Datalog UI',
   tagline: 'Declarative UI, meet Declarative Data',
   url: 'https://datalogui.dev',
   baseUrl: '/',
+  plugins: [path.resolve('./load-typedocs/src/index.js')],
   favicon: 'img/favicon.ico',
   organizationName: 'datalogui',  // Usually your GitHub org/user name.
   projectName: 'datalogui',       // Usually your repo name.

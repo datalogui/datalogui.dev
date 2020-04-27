@@ -1,5 +1,6 @@
 module.exports = {
   docs: {
-    "How To": ['usage', 'react'],
+    'How To': ['usage', 'react'],
+    'Extra': ['terminology'],
   },
 };
