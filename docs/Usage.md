@@ -86,7 +86,6 @@ Query.view().readAllData()
 It's also possible to say that something should not exist. This is declared with the `.not` method on tables inside queries. For example, let's find out who does not have a manager.
 
 ```ts
-// This will actually error because of a quirk
 const Query = datalog.query<{ personID: number, personName: string }>(
   ({ personName, personID }) => {
     People({ id: personID })
@@ -97,7 +96,6 @@ const Query = datalog.query<{ personID: number, personName: string }>(
 })
 
 Query.view().readAllData()
-// Should be =>
 /*
 [{
     personID: 0,
@@ -105,39 +103,6 @@ Query.view().readAllData()
 }]
 */
 ```
-
-This query almost works, but throws an error saying "Antis shouldn't propose".
-Which sounds vaguely romantic. The problem is the current join algorithm
-works by iterating over each item in the first table (`People` in this
-case) and then asking the tables we are joining against to see if they have any items
-they would like to propose to the current datum in `People`. Antis can't propose
-because they would yield infinite propositions – there are an infinite number of
-things that are not equal to something.
-
-Thankfully we can fix this with a simple trick. We can join the table with itself. This will not change the output, but it will make the second use of `People` now be the one to propose items to that first use of `People`. In this case the second `People` is proposing adding the `name` field to the output of the `id` from the first `People`.
-
-
-```ts
-// Now this works
-const Query = datalog.query<{ personID: number, personName: string }>(({ personName, personID }) => {
-    People({ id: personID })
-    // Add this! This will be in charge of proposing values
-    People({ id: personID, name: personName })
-    // Here we say: Only find personID for which this condition does `not` hold. i.e. Find a personID such that there is not a managee: personID datum inside the Manages table.
-    Manages.not({ managee: personID })
-})
-
-Query.view().readAllData()
-// Should be =>
-/*
-[{
-    personID: 0,
-    personName: "Alice",
-}]
-*/
-```
-
-Note: this will probably be changed so that the first version works in a future version of datalog. (PRs welcome!).
 
 ## Differential Updates
 
@@ -228,7 +193,6 @@ queryView.recentData()
 */
 
 ```
-
 
 
 UIs don't change the whole state of the world very often. So it's much faster
