@@ -9,7 +9,7 @@ sidebar_label: Usage
 This is analogous to a database table. To create a table call `datalog.newTable<T>(schema: Schema)`. Bonus points for adding types to your schema.
 
 ```ts
-import datalog from '@datalogui/datalog'
+import * as datalog from '@datalogui/datalog'
 
 const People = datalog.newTable<{id: number, name: string}>({
   id: datalog.NumberType,
