@@ -62,10 +62,15 @@ const Manages = datalog.newTable<{manager: ID, managee: ID}>({
 })
 
 // Find everyone who has a manager, and return their name and their manager's name
-datalog.query<{managerName: string, personName: string, personID: number, managerID: number}>(({managerName, personName, managerID, personID}) => {
+datalog.query<{
+  managerName: string,
+  personName: string,
+  personID: number,
+  managerID: number
+}>(({managerName, personName, managerID, personID}) => {
   People({id: personID, name: personName})
   Manages({managee: personID, manager: managerID})
-  People({id: managerID, name: managerNamek})
+  People({id: managerID, name: managerName})
 })
 
 Query.view().readAllData()
