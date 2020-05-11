@@ -26,8 +26,8 @@ module.exports = {
         },
         // {to: 'blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://gitlab.com/datalogui/datalog',
-          label: 'GitLab',
+          href: 'https://github.com/datalogui/datalog',
+          label: 'GitHub',
           position: 'right',
         },
       ],
