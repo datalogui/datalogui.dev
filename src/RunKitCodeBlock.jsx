@@ -20,17 +20,17 @@ async function loadDynamicScript(url, libraryName) {
 };
 
 function RK() {
-  const [RunKit, setRunKit] = React.useState(null)
+  const [RKLib, setRunKit] = React.useState(null)
   React.useEffect(() => {
     let stillMounted = true
-    if (!RunKit) {
+    if (!RKLib) {
       loadDynamicScript("https://embed.runkit.com").then(() => {
         // Defer until RK loaded in global scope
         const intervalID = setInterval(() => {
-          if (typeof RunKit !== undefined) {
+          if (typeof RunKit !== 'undefined') {
             clearInterval(intervalID)
-            if (stillMounted && typeof window !== undefined) {
-              setRunKit(window.RunKit)
+            if (stillMounted) {
+              setRunKit(RunKit)
             }
           }
         }, 16)
@@ -42,7 +42,7 @@ function RK() {
     }
   })
 
-  return RunKit
+  return RKLib
 
 }
 
