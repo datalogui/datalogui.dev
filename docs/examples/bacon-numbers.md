@@ -86,11 +86,9 @@ const BaconNumbersComponent = () => {
     return baconNumbersView.onChange(() => updateBaconNumbers(baconNumbersView.readAllData()))
   }, [baconNumbersView])
 
-  return <>
-  <pre>
+  return <pre>
     {JSON.stringify(baconNumbers, null, 2)}
   </pre>
-  </>
  }
 
 render(<BaconNumbersComponent />)
