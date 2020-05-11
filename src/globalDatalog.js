@@ -1,6 +1,17 @@
 import * as datalog from '@datalogui/datalog'
 import { useQuery } from '@datalogui/react'
 
-window.datalog = datalog
-window.useQuery = useQuery
-// global.datalog = datalog
+try {
+
+  if (typeof window !== undefined) {
+
+    window.datalog = datalog
+    window.useQuery = useQuery
+  }
+
+  if (typeof global !== undefined) {
+    global.datalog = datalog
+    global.useQuery = useQuery
+
+  }
+} catch (e) { }

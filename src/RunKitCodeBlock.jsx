@@ -29,7 +29,7 @@ function RK() {
         const intervalID = setInterval(() => {
           if (typeof RunKit !== undefined) {
             clearInterval(intervalID)
-            if (stillMounted) {
+            if (stillMounted && typeof window !== undefined) {
               setRunKit(window.RunKit)
             }
           }
