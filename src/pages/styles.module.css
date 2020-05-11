@@ -34,3 +34,8 @@
   height: 200px;
   width: 200px;
 }
+
+.helloWorld {
+  margin-bottom: var(--ifm-paragraph-margin-bottom);
+  text-align: left;
+}

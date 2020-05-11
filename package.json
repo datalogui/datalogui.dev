@@ -9,6 +9,8 @@
     "deploy": "docusaurus deploy"
   },
   "dependencies": {
+    "@datalogui/datalog": "^0.0.8",
+    "@datalogui/react": "^0.0.3",
     "@docusaurus/core": "^2.0.0-alpha.50",
     "@docusaurus/preset-classic": "^2.0.0-alpha.50",
     "@docusaurus/theme-live-codeblock": "^2.0.0-alpha.39",

@@ -2,10 +2,36 @@ import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
+import Head from '@docusaurus/Head';
+import Codeblock from '@theme/CodeBlock';
 import classnames from 'classnames';
 import React from 'react';
+import RunKitCodeBlock from '../RunKitCodeBlock'
+import {
+  LiveProvider,
+  LiveEditor,
+  LiveError,
+  LivePreview
+} from 'react-live'
 
 import styles from './styles.module.css';
+
+async function loadDynamicScript(url, libraryName) {
+  const existingScript = document.getElementById(libraryName);
+
+  if (!existingScript) {
+    const script = document.createElement('script');
+    script.src = url; // URL for the third-party library being loaded.
+    script.id = libraryName; // e.g., googleMaps or stripe
+    document.body.appendChild(script);
+
+    return new Promise(resolve => {
+      script.onload = resolve
+    })
+  } else {
+    return Promise.resolve()
+  }
+};
 
 const features = [
   {
@@ -44,6 +70,21 @@ const features = [
   },
 ];
 
+function RKEmbedLibrary({ onLoad }) {
+  const [libraryLoaded, setLibraryLoaded] = React.useState(false)
+  React.useEffect(() => {
+    if (!libraryLoaded) {
+      loadDynamicScript("https://embed.runkit.com").then(() => {
+        setLibraryLoaded(true)
+        if (typeof RunKit !== "undefined") {
+          onLoad()
+        }
+      })
+    }
+  })
+  return null
+}
+
 function Feature({ imageUrl, title, description }) {
   const imgUrl = useBaseUrl(imageUrl);
   return (
@@ -60,6 +101,34 @@ function Feature({ imageUrl, title, description }) {
   );
 }
 
+const exampleCode = `
+const datalog = require('@datalogui/datalog')
+
+// Build our data tables
+const Greetings = datalog.intoTable([
+  { language: "en", greeting: "Hello" },
+  { language: "es", greeting: "Hola" }
+  // ...
+])
+const Nouns = datalog.intoTable([
+  { language: "en", noun: "world" },
+  { language: "es", noun: "todos" }
+  // ...
+])
+
+// Query our data for English Greetings
+const GreetingQuery = datalog.query(({ greeting, noun }) => {
+  Greetings({ language: 'en', greeting })
+  Nouns({ language: 'en', noun })
+})
+
+GreetingQuery.view().readAllData()
+`
+
+function RKEmbed() {
+
+}
+
 function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
@@ -69,31 +138,32 @@ function Home() {
       'Description will go into a meta tag in <head />' >
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
         <div className='container'>
-          <h1 className='hero__title'>{siteConfig.title}<
-          /h1>
+          <h1 className='hero__title'>{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
-            <div className={styles.buttons}>< Link
-              className={classnames(
-                'button button--secondary button--lg',
-                styles.getStarted,
-              )} to={useBaseUrl('docs/usage')} >
-              Get Started</Link>
-            </div></div>
+          <RunKitCodeBlock sourceCode={exampleCode} />
+          <div className={styles.buttons}>< Link
+            className={classnames(
+              'button button--secondary button--lg',
+              styles.getStarted,
+            )} to={useBaseUrl('docs/usage')} >
+            Get Started</Link>
+          </div>
+        </div>
       </header><main> {features && features.length && (
-          <section className={styles.features}>
-            <div className='container'>
-              <div className='row'>
-                {features.map((props, idx) => (
-                  <Feature key={idx} {
-                    ...props} />
-                ))}
-              </div>
+        <section className={styles.features}>
+          <div className='container'>
+            <div className='row'>
+              {features.map((props, idx) => (
+                <Feature key={idx} {
+                  ...props} />
+              ))}
             </div>
-          </section>
-        )}
-        </main>
-    </Layout>
+          </div>
+        </section>
+      )}
+      </main>
+    </Layout >
   );
-      }
+}
 
-      export default Home;
+export default Home;

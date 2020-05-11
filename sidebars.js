@@ -1,6 +1,7 @@
 module.exports = {
   docs: {
     'How To': ['usage', 'react'],
-    'Extra': ['terminology'],
+    'Examples': ['examples/simple-join'],
+    'Appendix': ['terminology'],
   },
 };
