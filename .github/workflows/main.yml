@@ -20,15 +20,8 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           yarn build
-
-      - name: Install SSH Client 🔑
-        uses: webfactory/ssh-agent@v0.2.0
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          SSH: true
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: build # The folder the action should deploy.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
