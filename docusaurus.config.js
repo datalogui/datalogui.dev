@@ -17,7 +17,7 @@ module.exports = {
         alt: 'My Site Logo',
         src: 'img/logo-only-transparent.png',
       },
-      links: [
+      items: [
         {
           to: 'docs/usage',
           activeBasePath: 'docs',
@@ -49,8 +49,7 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${
-        new Date().getFullYear()} Marco Munizaga. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Marco Munizaga. Built with Docusaurus.`,
     },
   },
   presets: [
