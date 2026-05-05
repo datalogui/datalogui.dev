@@ -23,6 +23,15 @@
   justify-content: center;
 }
 
+.talkLink {
+  margin: 0 0 1.5rem;
+}
+
+.talkLink a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .features {
   display: flex;
   align-items: center;

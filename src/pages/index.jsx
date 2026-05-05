@@ -140,6 +140,12 @@ function Home() {
         <div className='container'>
           <h1 className='hero__title'>{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
+          <h3 className={styles.talkLink}>
+            Watch the talk from{' '}
+            <a href="https://www.hytradboi.com/2022/datalogui-rubbing-datalog-on-uis/">
+              <i>Have you Tried Rubbing A Database On It?</i>
+            </a>
+          </h3>
           <RunKitCodeBlock sourceCode={exampleCode} />
           <div className={styles.buttons}>< Link
             className={classnames(
