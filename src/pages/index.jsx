@@ -2,36 +2,13 @@ import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import Head from '@docusaurus/Head';
-import Codeblock from '@theme/CodeBlock';
+import usePrismTheme from '@theme/hooks/usePrismTheme';
 import classnames from 'classnames';
 import React from 'react';
-import RunKitCodeBlock from '../RunKitCodeBlock'
-import {
-  LiveProvider,
-  LiveEditor,
-  LiveError,
-  LivePreview
-} from 'react-live'
+import { Editor as CodeEditor } from 'react-live';
+import * as datalog from '@datalogui/datalog';
 
 import styles from './styles.module.css';
-
-async function loadDynamicScript(url, libraryName) {
-  const existingScript = document.getElementById(libraryName);
-
-  if (!existingScript) {
-    const script = document.createElement('script');
-    script.src = url; // URL for the third-party library being loaded.
-    script.id = libraryName; // e.g., googleMaps or stripe
-    document.body.appendChild(script);
-
-    return new Promise(resolve => {
-      script.onload = resolve
-    })
-  } else {
-    return Promise.resolve()
-  }
-};
 
 const features = [
   {
@@ -70,21 +47,6 @@ const features = [
   },
 ];
 
-function RKEmbedLibrary({ onLoad }) {
-  const [libraryLoaded, setLibraryLoaded] = React.useState(false)
-  React.useEffect(() => {
-    if (!libraryLoaded) {
-      loadDynamicScript("https://embed.runkit.com").then(() => {
-        setLibraryLoaded(true)
-        if (typeof RunKit !== "undefined") {
-          onLoad()
-        }
-      })
-    }
-  })
-  return null
-}
-
 function Feature({ imageUrl, title, description }) {
   const imgUrl = useBaseUrl(imageUrl);
   return (
@@ -101,8 +63,8 @@ function Feature({ imageUrl, title, description }) {
   );
 }
 
-const exampleCode = `
-const datalog = require('@datalogui/datalog')
+const exampleCode = `// Already in the browser's scope
+// import * as datalog from '@datalogui/datalog'
 
 // Build our data tables
 const Greetings = datalog.intoTable([
@@ -123,9 +85,148 @@ const GreetingQuery = datalog.query(({ greeting, noun }) => {
 })
 
 GreetingQuery.view().readAllData()
-`
+`;
 
-function RKEmbed() {
+function stringifyValue(value) {
+  if (value === undefined) {
+    return 'undefined';
+  }
+
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  return JSON.stringify(value, (_, nestedValue) => {
+    if (typeof nestedValue === 'symbol') {
+      return nestedValue.toString();
+    }
+
+    if (typeof nestedValue === 'function') {
+      return `[Function ${nestedValue.name || 'anonymous'}]`;
+    }
+
+    return nestedValue;
+  }, 2);
+}
+
+function runExample(sourceCode) {
+  const logs = [];
+  const scopedConsole = {
+    log: (...args) => logs.push(args.map(stringifyValue).join(' ')),
+    info: (...args) => logs.push(args.map(stringifyValue).join(' ')),
+    warn: (...args) => logs.push(args.map(stringifyValue).join(' ')),
+    error: (...args) => logs.push(args.map(stringifyValue).join(' ')),
+  };
+  const execute = new Function('datalog', 'console', 'sourceCode', (
+    '"use strict";\nreturn eval(sourceCode);'
+  ));
+
+  const runnableSource = sourceCode.replace(
+    /^\s*import\s+\*\s+as\s+datalog\s+from\s+['"]@datalogui\/datalog['"];?\s*$/gm,
+    '',
+  );
+
+  return {
+    logs,
+    value: execute(datalog, scopedConsole, runnableSource),
+  };
+}
+
+function InlineExampleRunner({ sourceCode }) {
+  const prismTheme = usePrismTheme();
+  const [editableCode, setEditableCode] = React.useState(sourceCode);
+  const [result, setResult] = React.useState(null);
+  const executeSource = React.useCallback((code) => {
+    try {
+      setResult({
+        ok: true,
+        ...runExample(code),
+      });
+    } catch (error) {
+      setResult({
+        ok: false,
+        error,
+      });
+    }
+  }, []);
+  const executeCode = React.useCallback(() => {
+    executeSource(editableCode);
+  }, [editableCode, executeSource]);
+
+  React.useEffect(() => {
+    executeSource(sourceCode);
+  }, [executeSource, sourceCode]);
+
+  const output = React.useMemo(() => {
+    if (result === null) {
+      return 'Click Run example to see the result.';
+    }
+
+    if (!result.ok) {
+      return result.error.stack || result.error.message;
+    }
+
+    const outputParts = [...result.logs];
+    if (result.value !== undefined) {
+      outputParts.push(stringifyValue(result.value));
+    }
+
+    return outputParts.join('\n') || 'undefined';
+  }, [result]);
+
+  return (
+    <div className={styles.helloWorld}>
+      <div className={styles.inlineRunner}>
+        <CodeEditor
+          className={styles.runnerEditor}
+          code={editableCode}
+          language="tsx"
+          onChange={setEditableCode}
+          style={{
+            fontFamily: 'var(--ifm-font-family-monospace)',
+            fontSize: 'var(--ifm-code-font-size)',
+            lineHeight: 'var(--ifm-pre-line-height)',
+          }}
+          tabSize={2}
+          textareaId="homepage-example-editor"
+          theme={prismTheme}
+        />
+        <label
+          className={styles.runnerEditorLabel}
+          htmlFor="homepage-example-editor">
+          Editable example code
+        </label>
+        <div className={styles.runnerActions}>
+          <button
+            className="button button--secondary button--sm"
+            type="button"
+            onClick={() => {
+              setEditableCode(sourceCode);
+              executeSource(sourceCode);
+            }}>
+            Reset
+          </button>
+          <button
+            className="button button--secondary button--sm"
+            type="button"
+            onClick={executeCode}>
+            Run example
+          </button>
+        </div>
+        <div className={styles.runnerOutput}>
+          <div className={styles.runnerOutputLabel}>Output</div>
+          <pre
+            aria-live="polite"
+            className={classnames(
+              styles.runnerOutputValue,
+              !result || result.ok ? null : styles.runnerOutputError,
+            )}>
+            {output}
+          </pre>
+        </div>
+      </div>
+    </div>
+  );
 
 }
 
@@ -146,7 +247,7 @@ function Home() {
               <i>Have you Tried Rubbing A Database On It?</i>
             </a>
           </h3>
-          <RunKitCodeBlock sourceCode={exampleCode} />
+          <InlineExampleRunner sourceCode={exampleCode} />
           <div className={styles.buttons}>< Link
             className={classnames(
               'button button--secondary button--lg',
